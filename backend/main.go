@@ -48,14 +48,14 @@ func ExecuteBashScript(script string) (int, string, error) {
 		}
 	}
 
-	log.Printf("Started script with PID: %d\nRaw command: %s", pid, rawCommand)
+	log.Printf("Executed script with PID: %d\nRaw command: %s", pid, rawCommand)
 
-	err = cmd.Wait()
-	if err != nil {
-		return 0, "", fmt.Errorf("failed to wait for script: %v", err)
-	}
+	// err = cmd.Wait()
+	// if err != nil {
+	// 	return 0, "", fmt.Errorf("failed to wait for script: %v", err)
+	// }
 
-	log.Printf("Script with PID %d finished executing", pid)
+	// log.Printf("Script with PID %d finished executing", pid)
 
 	return pid, rawCommand, nil
 }
@@ -64,9 +64,9 @@ func StartService(serviceName string) error {
 	var startCommand string
 	switch serviceName {
 	case "personalSite":
-		startCommand = "npm run dev"
+		startCommand = "regex1"
 	case "basicCalculator":
-		startCommand = "python3 app.py"
+		startCommand = "regex2"
 	default:
 		return fmt.Errorf("unknown service: %s", serviceName)
 	}
@@ -76,30 +76,30 @@ func StartService(serviceName string) error {
 		return fmt.Errorf("failed to start service %s: %v", serviceName, err)
 	}
 
-	log.Printf("Service %s started with command: %s", serviceName, rawCommand)
+	fmt.Printf("Service %s started with command: %s", serviceName, rawCommand)
 
 	return nil
 }
 
 func StopService(serviceName string) error {
-	var startCommand string
+	var stopRegex string
 	switch serviceName {
 	case "personalSite":
-		startCommand = "npm run dev"
+		stopRegex = "regex1"
 	case "basicCalculator":
-		startCommand = "python3 app.py"
+		stopRegex = "regex2"
 	default:
 		return fmt.Errorf("unknown service: %s", serviceName)
 	}
 	var stopCommand string
-	stopCommand = fmt.Sprintf("pkill -f '%s'", startCommand)
+	stopCommand = fmt.Sprintf("pkill -f '%s'", stopRegex)
 
 	_, _, err := ExecuteBashScript(stopCommand)
 	if err != nil {
 		return fmt.Errorf("failed to stop service %s: %v", serviceName, err)
 	}
 
-	log.Printf("Service %s stopped successfully", serviceName)
+	fmt.Printf("Service %s stopped successfully", serviceName)
 	return nil
 }
 
@@ -115,7 +115,7 @@ func RestartService(serviceName string) error {
 		return fmt.Errorf("failed to start service %s: %v", serviceName, err)
 	}
 
-	log.Printf("Service %s restarted successfully", serviceName)
+	fmt.Printf("Service %s restarted successfully", serviceName)
 	return nil
 }
 

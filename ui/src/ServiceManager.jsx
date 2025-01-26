@@ -5,39 +5,51 @@ function ServiceManager() {
         { name: "personalSite", status: "stopped" },
         { name: "basicCalculator", status: "stopped" }
     ]);
+    const [loading, setLoading] = useState(false);
+    const [loadingService, setLoadingService] = useState(null); // Track which service is loading
 
-    const backendUrl = 'http://localhost:8080'
+    const backendUrl = 'http://localhost:8080';
 
     const handleStart = async (serviceName) => {
-        await fetch(`${backendUrl}/api/start/${serviceName}`, { method: 'POST' });
-
+        setLoading(true);
+        setLoadingService(serviceName); // Set the service being loaded
+        const res = await fetch(`${backendUrl}/api/start/${serviceName}`, { method: 'POST' });
         setServices(services.map(service =>
             service.name === serviceName
                 ? { ...service, status: "running" }
                 : service
         ));
-        console.log('performed start')
+        setLoading(false);
+        setLoadingService(null); // Reset loading state
+        console.log('performed start');
     };
 
     const handleStop = async (serviceName) => {
+        setLoading(true);
+        setLoadingService(serviceName);
         await fetch(`${backendUrl}/api/stop/${serviceName}`, { method: 'POST' });
-
         setServices(services.map(service =>
             service.name === serviceName
                 ? { ...service, status: "stopped" }
                 : service
         ));
-        console.log('performed stop')
+        setLoading(false);
+        setLoadingService(null);
+        console.log('performed stop');
     };
 
     const handleRestart = async (serviceName) => {
+        setLoading(true);
+        setLoadingService(serviceName);
         await fetch(`${backendUrl}/api/restart/${serviceName}`, { method: 'POST' });
-
         setServices(services.map(service =>
             service.name === serviceName
                 ? { ...service, status: "running" }
                 : service
         ));
+        setLoading(false);
+        setLoadingService(null);
+        console.log('performed restart');
     };
 
     return (
@@ -57,9 +69,24 @@ function ServiceManager() {
                             <td>{service.name}</td>
                             <td>{service.status}</td>
                             <td>
-                                <button onClick={() => handleStart(service.name)}>Start</button>
-                                <button onClick={() => handleStop(service.name)}>Stop</button>
-                                <button onClick={() => handleRestart(service.name)}>Restart</button>
+                                <button
+                                    onClick={() => handleStart(service.name)}
+                                    disabled={loading && loadingService === service.name}
+                                >
+                                    {loadingService === service.name ? '...' : 'Start'}
+                                </button>
+                                <button
+                                    onClick={() => handleStop(service.name)}
+                                    disabled={loading && loadingService === service.name}
+                                >
+                                    {loading && loadingService === service.name ? '...' : 'Stop'}
+                                </button>
+                                <button
+                                    onClick={() => handleRestart(service.name)}
+                                    disabled={loading && loadingService === service.name}
+                                >
+                                    {loading && loadingService === service.name ? '...' : 'Restart'}
+                                </button>
                             </td>
                         </tr>
                     ))}
